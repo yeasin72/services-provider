@@ -1,0 +1,33 @@
+{
+  "name": "fix",
+  "version": "1.0.0",
+  "description": "api fix application",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "nodemon server.js",
+    "start": "node server.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "bcrypt": "^5.0.1",
+    "colors": "^1.4.0",
+    "console-emoji-log": "^1.0.1",
+    "cookie-parser": "^1.4.6",
+    "cors": "^2.8.5",
+    "cryptr": "^6.0.2",
+    "dotenv": "^16.0.0",
+    "email-validator": "^2.0.4",
+    "express": "^4.17.2",
+    "http-errors": "^2.0.0",
+    "jsonwebtoken": "^8.5.1",
+    "mysql2": "^2.3.3",
+    "sequelize": "^6.17.0",
+    "validator": "^13.7.0"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.15"
+  }
+}

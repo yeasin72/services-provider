@@ -1,0 +1,30 @@
+
+
+                Fixcode
+                    |
+                    |-----> api
+                    |       |
+                    |       |-----> orm
+                    |       |
+                    |       |-----> web api
+                    |       |
+                    |       |-----> verification
+                    |
+                    |-----> web
+                    |       |
+                    |       |-----> admin
+                    |       |
+                    |       |-----> website
+                    |
+                    |-----> design
+                    |       |
+                    |       |-----> design structure
+                    |
+                    |-----> app
+                    |       |
+                    |       |-----> mobile app architecture
+                    |       |
+                    |       |-----> mobile app design
+                    |       |
+                    |       |-----> mobile app
+
