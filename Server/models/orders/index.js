@@ -18,8 +18,11 @@ module.exports = sequelize.define("orders", {
     quantity: {
         type: Sequelize.INTEGER(3)
     },
-    servicesId:{
-        type: Sequelize.INTEGER(11),
-        allowNull: false,
+    userId:{
+        type: Sequelize.INTEGER,
+        references:{
+            model: "users",
+            key: "id"
+        }
     }
     }, {initialAutoIncrement:1000})
