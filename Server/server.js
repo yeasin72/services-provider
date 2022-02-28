@@ -3,8 +3,8 @@ const express = require('express')
 const cookieParser = require('cookie-parser')
 const app = express()
 const cors = require('cors');
-// DB connection
-// require('./db/db.config')
+//DB connection
+require('./db/db.config')
 const PORT = process.env.PORT || 6000
 const corsOptions = {
     // origin:'http://localhost:3000', 

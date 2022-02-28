@@ -1,67 +1,116 @@
 const express = require('express')
 const tokenrouter = express.Router()
-const connection = require('../../../db/db.config')
 const bcrypt = require('bcrypt')
-const userConfig = require('../../../custom/user.config')
-const { signAccessToken, signRefreshToken, encryptToken } = require('../../../controllers/jwt.controler')
+const { signAccessToken, signRefreshToken, encryptToken, audienceMaker } = require('../../../controllers/jwt.controler')
 const setNewError = require('../../../helper/error.helper')
 const responseHelper = require('../../../helper/response.helper')
-const { statusControler } = require('../../../controllers/error.controler')
+const { userFindOne, createAccessLog, updateAccessLog } = require('../../../helper/user.helper')
+const isAuth = require('../../../middleware/isauth')
 
 
-tokenrouter.post('/', (req, res) => {
+
+tokenrouter.post('/', isAuth, (req, res) => {
     const { email, password } = req.body
-    const findsql = `SELECT * FROM ${userConfig.tablename} WHERE ${userConfig.email} = "${email}";`
-    connection.query(findsql, (finderr, findresult) => {
-        if (!finderr) {
-            const data = findresult[0]
-            if (data?.user_password) {
-                bcrypt.compare(password, data.user_password, (err, result) => {
-                    if (!err && result) {
-                        signRefreshToken(data.id)
-                            .then(refreshtoken => {
-                                const sql = `INSERT INTO server_log (authdata) VALUES("${refreshtoken}");`
-                                connection.query(sql, (logerror, logback) => {
-                                    if (logerror) {
-                                        const error = setNewError(500, "Internal server error")
-                                        statusControler('Error', req)
-                                        res.status(500).json(error)
-                                    }else{
-                                        const tokenID = logback?.insertId
-                                        signAccessToken(tokenID)
-                                            .then(token => {
-                                                statusControler('Success', req)
-                                                const modifiedAccessToken = encryptToken(token)
-                                                const modifiedRefreshToken = encryptToken(refreshtoken)
-                                                const response = responseHelper(201, {accessToken: modifiedAccessToken}, 'token found')
-                                                res.status(201).cookie('verificationToken', modifiedRefreshToken, {
-                                                    httpOnly: true
-                                                }).json(response)
+    if (email && password) {
+        userFindOne(email)
+            .then(result => {
+                if (result === !undefined) {
+                    // if no user found
+                    const error = setNewError(req, 400, "email / password not correct")
+                    res.status(error.status).json(error)
+                }else{
+                    if (result?.dataValues.email === email) {
+                        const data = result.dataValues
+                        bcrypt.compare(password, data.user_password, (err, ispasswordCorrect) => {
+                            if (!err && ispasswordCorrect) {
+                                const aud = audienceMaker(data.id)
+                                signRefreshToken(aud)
+                                    .then(reftoken => {
+                                        createAccessLog(aud, reftoken)
+                                            .then(result => {
+                                                if (result?.dataValues) {
+                                                    const refreshdata = result.dataValues
+                                                    signAccessToken(data.id)
+                                                        .then(accToken => {
+                                                            const encryptedAccesstoken = encryptToken(accToken)
+                                                            const encryptedRefreshtoken = encryptToken(refreshdata.authdata)
+                                                            const response = responseHelper(req, 200, {token: encryptedAccesstoken}, 'access restored')
+                                                            res.status(response.status).cookie('controler', encryptedRefreshtoken).json(response)
+                                                                        
+                                                        })
+                                                        .catch(() => {
+                                                            // if creating token err
+                                                            const error = setNewError(req, 500, "something went wrong")
+                                                            res.status(error.status).json(error)
+                                                        })
+                                                }else{
+                                                    console.log('something went wrong');
+                                                }
                                             })
-                                            .catch(() => {
-                                                const error = setNewError(500, "Internal server error")
-                                                statusControler('Error', req)
-                                                res.status(500).json(error)
+                                            .catch(err => {
+                                                if (err?.errors[0]?.validatorKey === "not_unique") {
+                                                    // if user already in database
+                                                    updateAccessLog(aud, reftoken)
+                                                        .then(result => {
+                                                            if (result[0]) {
+                                                                const refreshdata = data.id
+                                                                signAccessToken(refreshdata)
+                                                                    .then(accToken => {
+                                                                        const encryptedAccesstoken = encryptToken(accToken)
+                                                                        const encryptedRefreshtoken = encryptToken(reftoken)
+                                                                        const response = responseHelper(req, 200, {token: encryptedAccesstoken}, 'access restored')
+                                                                        res.status(response.status).cookie('controler', encryptedRefreshtoken).json(response)
+                                                                        
+                                                                    })
+                                                                    .catch((err) => {
+                                                                        // if creating token err
+                                                                        const error = setNewError(req, 500, "something went wrong 2")
+                                                                        res.status(error.status).json(error)
+                                                                    })
+                                                            }else{
+                                                                console.log('something went wrong');
+                                                            }
+                                                        })
+                                                        .catch(() => {
+                                                            // if something wrong with database
+                                                            const error = setNewError(req, 500, 'Internal server error')
+                                                            res.status(error.status).json(error)
+                                                        })
+                                                }else{
+                                                    // if something wrong with database
+                                                    const error = setNewError(req, 500, 'Internal server error')
+                                                    res.status(error.status).json(error)
+                                                }
                                             })
-                                    }
-                                })
-                            })
-                            .catch(() => {
-                                const error = setNewError(500, "Internal server error")
-                                statusControler('Error', req)
-                                res.status(500).json(error)
-                            })
-
-                        
+                                    })
+                                    .catch(() => {
+                                        // if creating token err
+                                        const error = setNewError(req, 500, "something went wrong")
+                                        res.status(error.status).json(error)
+                                    })
+                            }else{
+                                // if no user found
+                                const error = setNewError(req, 400, "email / password not correct")
+                                res.status(error.status).json(error)
+                            }
+                        })
                     }else{
-                        const error = setNewError(404, "Invalid email or password")
-                        statusControler('Warn', req)
-                        res.status(404).json(error)
+                        // if any problem with database
+                        const error = setNewError(req, 500, "something went wrong")
+                        res.status(error.status).json(error)
                     }
-                })
-            }
-        }
-    })
+                }
+            })
+            .catch(() => {
+                // if any problem with database
+                const error = setNewError(req, 500, "Internal server err")
+                res.status(error.status).json(error)
+            })
+    }else{
+        // if any problem with database
+        const error = setNewError(req, 422, "Invalid data")
+        res.status(error.status).json(error)
+    }
 }) 
 
 module.exports = tokenrouter

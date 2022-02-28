@@ -1,9 +1,9 @@
 const express = require('express')
-const isAuthenticated = require('../../middleware/authentication')
 const authrouter = express.Router()
 
 
 
-authrouter.use('/profile', isAuthenticated, require('./profile'))
+authrouter.use('/profile', require('./profile'))
+
 
 module.exports = authrouter

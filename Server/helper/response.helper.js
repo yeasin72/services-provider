@@ -1,5 +1,9 @@
+const { statusControler } = require('../controllers/error.controler')
 
-function responseHelper(status, data, mess = 'response successfully done') {
+function responseHelper(req, status, data, mess = 'response successfully done') {
+    if (status > 199 && status < 300) {
+        statusControler('Success', req)
+    }
     return {
         status: status,
         success: true,
