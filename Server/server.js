@@ -5,13 +5,13 @@ const app = express()
 const cors = require('cors');
 //DB connection
 require('./db/db.config')
+require('./helper/orm.helper')();
 const PORT = process.env.PORT || 6000
 const corsOptions = {
     // origin:'http://localhost:3000', 
     credentials:true,          
     optionSuccessStatus:200
 }
-
 
 app.use(cookieParser())
 app.use(express.json())

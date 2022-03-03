@@ -11,16 +11,28 @@ module.exports = sequelize.define("services", {
         type: Sequelize.TEXT,
         allowNull: false
     },
-    price:{
-        type: Sequelize.INTEGER(5),
+    budget:{
+        type: Sequelize.INTEGER(8),
+        allowNull: false
+    },
+    duration:{
+        type: Sequelize.STRING(4),
         allowNull: false
     },
     services_description:{
         type: Sequelize.TEXT,
         allowNull: false
     },
-    services_category: {
-        type: Sequelize.ARRAY(Sequelize.STRING(50)),
-        allowNull: true
+    service_img_url:{
+        type: Sequelize.TEXT,
+        allowNull: false
+    },
+    categoryId: {
+        type: Sequelize.INTEGER(11),
+        allowNull: false
+    },
+    authorId: {
+        type: Sequelize.INTEGER(11),
+        allowNull: false
     }
 }, {initialAutoIncrement:1000})

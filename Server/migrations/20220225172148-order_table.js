@@ -2,30 +2,52 @@
 
 module.exports = {
   async up (queryInterface, Sequelize) {
-    queryInterface.createTable("orders", {
+    await queryInterface.createTable("orders", {
       id:{
         type: Sequelize.INTEGER(11),
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
       },
-      product_title:{
+      service_name:{
         type: Sequelize.TEXT,
         allowNull: false,
       },
-      price:{
+      budget_price:{
         type: Sequelize.STRING(10),
         allowNull: false
       },
+      price:{
+        type: Sequelize.STRING(10),
+        allowNull: false,
+        defaultValue: 0
+      },
       quantity: {
-        type: Sequelize.INTEGER(3)
+        type: Sequelize.INTEGER(3),
+        allowNull: false,
+        defaultValue: 1
+      },
+      order_status:{
+        type: Sequelize.STRING(1),
+        allowNull: false,
+        defaultValue: '1'
+      },
+      ispaid:{
+        type: Sequelize.BOOLEAN,
+        allowNull:false,
+        defaultValue: false
+      },
+      serviceId:{
+        type: Sequelize.INTEGER(11),
+        allowNull: false
+      },
+      adminId:{
+        type: Sequelize.INTEGER(11),
+        allowNull: false
       },
       userId:{
-        type: Sequelize.INTEGER,
-        references:{
-          model: "users",
-          key: "id"
-        }
+        type: Sequelize.INTEGER(11),
+        allowNull: false
       },
       createdAt: Sequelize.DATE,
       updatedAt: Sequelize.DATE

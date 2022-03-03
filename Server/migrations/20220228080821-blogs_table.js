@@ -2,21 +2,29 @@
 
 module.exports = {
   async up (queryInterface, Sequelize) {
-    await queryInterface.createTable("server_logs", {
+    
+    await queryInterface.createTable("blogs", {
       id:{
         type: Sequelize.INTEGER(11),
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
       },
-      authId: {
-        type: Sequelize.STRING(300),
-        allowNull: false,
-        unique: true,
+      blogTitle: {
+        type: Sequelize.STRING(150),
+        allowNull: false
       },
-      authdata: {
-          type: Sequelize.TEXT,
-          allowNull: false
+      blogContent: {
+        type: Sequelize.TEXT,
+        allowNull: false
+      },
+      categoryId: {
+        type: Sequelize.INTEGER(11),
+        allowNull: false,
+      },
+      authorId: {
+        type: Sequelize.INTEGER(11),
+        allowNull: false,
       },
       createdAt: Sequelize.DATE,
       updatedAt: Sequelize.DATE
@@ -24,6 +32,6 @@ module.exports = {
   },
 
   async down (queryInterface, Sequelize) {
-    queryInterface.dropTable("server_logs")
+    queryInterface.dropTable('blogs');
   }
 };

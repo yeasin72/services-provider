@@ -2,38 +2,31 @@
 
 module.exports = {
   async up (queryInterface, Sequelize) {
-    await queryInterface.createTable("services", {
+    
+    await queryInterface.createTable("reviews", {
       id:{
         type: Sequelize.INTEGER(11),
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
       },
-      services_name:{
+      comment: {
         type: Sequelize.TEXT,
+        allowNull: false 
+      },
+      rating: {
+        type: Sequelize.FLOAT(2),
         allowNull: false
       },
-      budget:{
-        type: Sequelize.INTEGER(8),
-        allowNull: false
+      orderId: {
+        type: Sequelize.INTEGER(11),
+        allowNull: false,
       },
-      duration:{
-        type: Sequelize.STRING(4),
-        allowNull: false
-      },
-      services_description:{
-        type: Sequelize.TEXT,
-        allowNull: false
-      },
-      service_img_url:{
-        type: Sequelize.TEXT,
-        allowNull: false
-      },
-      categoryId: {
+      userId: {
         type: Sequelize.INTEGER(11),
         allowNull: false
       },
-      authorId: {
+      serviceId: {
         type: Sequelize.INTEGER(11),
         allowNull: false
       },
@@ -43,6 +36,6 @@ module.exports = {
   },
 
   async down (queryInterface, Sequelize) {
-    queryInterface.dropTable('services')
+    await queryInterface.dropTable('reviews');
   }
 };

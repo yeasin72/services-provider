@@ -16,14 +16,6 @@ class Uservalidation {
             return false
         }
     }
-
-    avatarValidation(avatar) {
-        if (avatar.length > 6) {
-            return true
-        }else{
-            return false
-        }
-    }
     passwordValidation (password) {
         if (validator.isStrongPassword(password)) {
             return true
@@ -31,7 +23,7 @@ class Uservalidation {
             return false
         }
     }
-
+    
 }
 
 module.exports = new Uservalidation

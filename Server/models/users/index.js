@@ -28,5 +28,5 @@ module.exports = sequelize.define("users", {
         type: Sequelize.BOOLEAN,
         allowNull: false,
         defaultValue: false
-    }
+    },
 }, {initialAutoIncrement:1000})
